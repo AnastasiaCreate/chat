@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="css/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">-->
+    <link href="css/main.css" rel="stylesheet">
+
+    <title>Chat</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Chat</a>
+            <form action="index.html" class="d-flex">
+            </form>
+        </div>
+        </div>
+    </nav>
+
+    <main>
+        <div id="alert" class="invalid-block" style="display: none"></div>
+        <div id="ok" class="valid-block" style="display: none">Успешная регистрация</div>
+
+        <div class="container">
+
+            <div class="py-5 text-center">
+
+                <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
+
+                <form onsubmit="start(event)">
+
+                    <div class="col-12">
+                        <label for="login" class="form-label">Введите логин</label>
+                        <input class="form-control" id="login" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="password" class="form-label">Введите пароль</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="re_password" class="form-label">Повторите пароль</label>
+                        <input type="password" class="form-control" id="re_password" required>
+                    </div>
+
+                    <div class="col-12">
+                        <p>Уже зарегистрированы? <a class="link-secondary" id="auth" href="index.html">Войти</a></p>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button id="button" class="btn  btn-outline-secondary" type="submit">Зарегистрироваться</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+
+</body>
+
+</html>
+
+<script src="js/vendor/bootstrap/bootstrap.min.js"></script>
+<script src="js/vendor/jquery-3.6.0.min.js"></script>
+<script src="js/main.js"></script>
+<script type="application/javascript">
+    if (sessionStorage.getItem('user') !== null) {
+        login(true)
+            .then(function(r) {
+                console.log(r);
+            })
+            .catch(function(r) {
+                console.log(r);
+            });
+    }
+
+    function start(event) {
+        event.preventDefault();
+        let btn = $('#button');
+
+        btn.prop('disabled', true);
+
+        let pass = $('#password').val();
+        let re_pass = $('#re_password').val();
+        if (pass !== re_pass) {
+            let alert = $('#alert');
+
+            btn.prop('disabled', false);
+            alert.show();
+            alert.text('Пароли не совпадают');
+            return;
+        }
+
+        login(false, true)
+            .then(function(r) {
+                console.log(r);
+            })
+            .catch(function(r) {
+                console.log(r);
+            });
+    }
+</script>

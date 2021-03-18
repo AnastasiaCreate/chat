@@ -1,0 +1,75 @@
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer" />
+
+    <link href="css/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">-->
+    <link href="css/main.css" rel="stylesheet">
+
+    <title>Chat</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Chat</a>
+            <form action="index.html" class="d-flex">
+            </form>
+        </div>
+        </div>
+    </nav>
+
+    <div class="invalid-block" id="alert" style="display: none"></div>
+    <div class="valid-block" id="ok" style="display: none">Успешный вход</div>
+
+    <main class="form-signin">
+
+        <form class="text-center" onsubmit="start(event)">
+            <h1 class="h3 mb-3 fw-normal">Вход</h1>
+
+            <input required id="login" class="form-control" placeholder="Логин">
+
+            <input required type="password" id="password" class="form-control" placeholder="Пароль">
+
+            <p>Ещё нет аккаунта? <a class="link-secondary" href="registration.html">Зарегистрироваться</a></p>
+
+            <button id="button" class="w-100 btn btn-primary btn-dark" type="submit">Войти</button>
+
+        </form>
+    </main>
+
+
+</body>
+
+</html>
+
+<script src="js/vendor/bootstrap/bootstrap.min.js"></script>
+<script src="js/vendor/jquery-3.6.0.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+    if (sessionStorage.getItem('user') !== null) {
+        login(true)
+            .then(function(r) {
+                console.log(r);
+            })
+            .catch(function(r) {
+                console.log(r);
+            });
+    }
+
+    function start(event) {
+        event.preventDefault();
+        $('#button').prop('disabled', true);
+        login()
+            .then(function(r) {
+                console.log(r);
+            })
+            .catch(function(r) {
+                console.log(r);
+            });
+    }
+</script>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="css/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">-->
+    <link href="css/main.css" rel="stylesheet">
+
+    <title>Chat</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Chat</a>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-secondary" type="button" onclick="exit()">Выйти</button>
+            </div>
+        </div>
+        </div>
+    </nav>
+
+    <div class="chat-container">
+        <div class="d-flex justify-content-center h-100">
+            <div class="col-md-8 col-xl-6 chat">
+                <div class="card">
+                    <div class="card-header msg_head">
+                        <div class="d-flex bd-highlight">
+                            <div class="user_info">
+                                <span>Chat</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body msg_card_body" id="chat">
+
+                        <!--Тут будут сообщения-->
+
+                    </div>
+                    <div class="card-footer">
+                        <div class="input-group">
+                            <div class="input-group-append">
+                            </div>
+                            <textarea class="form-control type_msg" id="input" placeholder="Напишите сообщение..." autocomplete="off" onkeypress="send(event)"></textarea>
+                            <div class="input-group-append">
+                                <span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script src="js/vendor/bootstrap/bootstrap.min.js"></script>
+<script src="js/vendor/jquery-3.6.0.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+    if (sessionStorage.getItem('user') === null)
+        document.location.href = 'index.html';
+
+    function exit() {
+        sessionStorage.clear();
+        document.location.href = 'index.html';
+    }
+
+    $(document).ready(function() {
+        chatWork();
+        setInterval(() => {
+            liveUp()
+        }, 1000 * 50)
+    })
+
+    function chatWork(prep = false) {
+        let body = document.getElementById('chat');
+
+        let last = -1;
+
+
+        for (let i = 0; i < body.children.length; i++)
+            if (body.children[i].getAttribute('data-id') !== '-1') {
+                last = Number.parseInt(body.children[i].getAttribute('data-id'));
+                break;
+            }
+
+        loadChat(last, 25).then( //загрузка чата
+            value => {
+                let user = JSON.parse(sessionStorage.getItem('user'));
+                value.forEach(function(item) {
+
+                    item['date_time'] *= 1000;
+                    let time = new Date(item['date_time']);
+
+                    let dom = document.createElement('div');
+                    dom.classList.add('d-flex');
+                    dom.classList.add('justify-content-start');
+                    dom.classList.add('mb-4');
+                    dom.setAttribute('data-id', item['id']);
+
+                    if (item['login'] !== user['username'])
+                        dom.classList.add('send');
+
+
+                    let template = '';
+                    template += `<span class="user_info">${item['login']}</span>`;
+                    template += `<div class="msg_cotainer">`;
+                    template += item['message'];
+                    template += `<span class="msg_time">${normalizeTime(time)}</span></div>`;
+
+                    dom.innerHTML = template;
+
+                    if (prep)
+                        document.getElementById('chat').prepend(dom);
+                    else
+                        document.getElementById('chat').append(dom);
+
+                })
+
+                setTimeout(() => {
+                    chatWork(true)
+                }, 3000)
+            },
+            reason => {
+                sessionStorage.clear();
+                document.location.href = 'index.html';
+            }
+        );
+    }
+
+    function send(event) { //отправка сообщений
+        if (event.shiftKey || event.key !== 'Enter')
+            return;
+
+        event.preventDefault();
+        let text = document.getElementById('input').value;
+
+        if (text.length < 1)
+            return;
+
+        document.getElementById('input').value = '';
+
+        let user = JSON.parse(sessionStorage.getItem('user'));
+
+        let dom = document.createElement('div');
+        dom.classList.add('d-flex');
+        dom.classList.add('justify-content-start');
+        dom.classList.add('mb-4');
+        dom.setAttribute('data-id', '-1');
+
+        let template = '';
+        template += `<span class="user_info">${user['username']}</span>`;
+        template += `<div class="msg_cotainer">`;
+        template += text;
+        template += `<span class="msg_time">${normalizeTime(new Date())}</span></div>`;
+
+        dom.innerHTML = template;
+
+        document.getElementById('chat').prepend(dom);
+
+        let msg = sendMsg(text);
+        msg.then(
+            value => {
+                if (typeof value === "number")
+                    dom.setAttribute('data-id', value);
+            }
+        )
+    }
+</script>
